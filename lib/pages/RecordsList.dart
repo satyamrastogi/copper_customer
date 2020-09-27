@@ -1,0 +1,88 @@
+import 'package:copper_customer/bloc/RecordBloc.dart';
+import 'package:copper_customer/db/DatabaseProviderRecord.dart';
+import 'package:copper_customer/event/record/SetRecord.dart';
+import 'package:copper_customer/model/Customer.dart';
+import 'package:copper_customer/model/Record.dart';
+import 'package:copper_customer/pages/RecordForm.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+
+class RecordsList extends StatefulWidget {
+  final Customer customer;
+
+  const RecordsList({Key key, @required this.customer}) : super(key: key);
+
+  @override
+  _RecordListState createState() => _RecordListState(customer);
+}
+
+class _RecordListState extends State<RecordsList> {
+  final Customer customer;
+
+  _RecordListState(this.customer);
+
+  @override
+  void initState() {
+    super.initState();
+    DatabaseProviderRecord.db.getRecord(customer.id).then(
+      (recordList) {
+        BlocProvider.of<RecordBloc>(context).add(SetRecord(recordList));
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var customerName = customer.name;
+    print("Building entire Record list scaffold");
+    return Scaffold(
+      appBar: AppBar(title: Text("Record List $customerName")),
+      body: Container(
+        child: BlocConsumer<RecordBloc, List<Record>>(
+          builder: (context, recordList) {
+            return ListView.separated(
+              itemBuilder: (BuildContext context, int index) {
+                print("recordList: $recordList");
+                Record record = recordList[index];
+                return ListTile(
+                    title: Text(
+                        "Width : " +
+                            record.copperWireSize.toString() +
+                            ", Length : " +
+                            record.length.toString() +
+                            ", Price :" +
+                            record.price.toString(),
+                        style: TextStyle(fontSize: 18)),
+                    subtitle: Text(" GST :" +
+                        _getZeroIfNull(record.gstPercentage) +
+                        " CGST : " +
+                        _getZeroIfNull(record.cgstPercentage)));
+              },
+              itemCount: recordList.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  Divider(color: Colors.black),
+            );
+          },
+          listener: (BuildContext context, foodList) {},
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  RecordForm(customer: customer)),
+        ),
+      ),
+    );
+  }
+
+  String _getZeroIfNull(double value) {
+    if(value == null)
+      return "0";
+    return value.toString();
+  }
+}
