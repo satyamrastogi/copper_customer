@@ -39,12 +39,12 @@ class RecordFormState extends State<RecordForm> {
   Widget _buildPrice() {
     return TextFormField(
       initialValue: _price == null ? "" : _price.toString(),
-      decoration: InputDecoration(labelText: 'Price'),
+      decoration: InputDecoration(labelText: 'Price ₹'),
       maxLength: 15,
       style: TextStyle(fontSize: 18),
       validator: (String value) {
         if (value.isEmpty) {
-          return 'price is Required';
+          return 'Price is Required';
         }
         if(double.tryParse(value) == null) {
           return 'Enter Number';
@@ -60,12 +60,12 @@ class RecordFormState extends State<RecordForm> {
   Widget _buildLength() {
     return TextFormField(
       initialValue: _length == null ? "" : _length.toString(),
-      decoration: InputDecoration(labelText: 'Length'),
+      decoration: InputDecoration(labelText: 'Length  M'),
       maxLength: 15,
       style: TextStyle(fontSize: 18),
       validator: (String value) {
         if (value.isEmpty) {
-          return 'length is Required';
+          return 'Length is Required';
         }
         if(double.tryParse(value) == null) {
           return 'Enter Number';
@@ -82,12 +82,12 @@ class RecordFormState extends State<RecordForm> {
     return TextFormField(
       initialValue:
           _cooper_wire_size == null ? "" : _cooper_wire_size.toString(),
-      decoration: InputDecoration(labelText: 'Wire size'),
+      decoration: InputDecoration(labelText: 'Wire size  MM'),
       maxLength: 15,
       style: TextStyle(fontSize: 18),
       validator: (String value) {
         if (value.isEmpty) {
-          return 'size is Required';
+          return 'Size is Required';
         }
         if(double.tryParse(value) == null) {
           return 'Enter Number';
