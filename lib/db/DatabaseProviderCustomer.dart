@@ -1,13 +1,15 @@
+import 'package:copper_customer/db/DatabaseProviderRecord.dart';
 import 'package:copper_customer/model/Customer.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-class DatabaseProvider{
+class DatabaseProvider {
   static const String TABLE_CUSTOMER = "CUSTOMER";
   static const String CUSTOMER_ID = "ID";
   static const String NAME = "NAME";
   static const String IS_ACTIVE = "IS_ACTIVE";
+
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
   Database _database;
@@ -35,10 +37,10 @@ class DatabaseProvider{
 
         await database.execute(
           "CREATE TABLE $TABLE_CUSTOMER ("
-              "$CUSTOMER_ID INTEGER PRIMARY KEY,"
-              "$NAME TEXT,"
-              "$IS_ACTIVE BOOL"
-              ")",
+          "$CUSTOMER_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+          "$NAME TEXT,"
+          "$IS_ACTIVE BOOL"
+          ")",
         );
       },
     );
@@ -47,8 +49,8 @@ class DatabaseProvider{
   Future<List<Customer>> getCustomer() async {
     final db = await database;
 
-    var customers = await db
-        .query(TABLE_CUSTOMER, columns: [CUSTOMER_ID, NAME, IS_ACTIVE]);
+    var customers =
+        await db.query(TABLE_CUSTOMER, columns: [CUSTOMER_ID, NAME, IS_ACTIVE]);
 
     List<Customer> result = List<Customer>();
 
@@ -69,7 +71,7 @@ class DatabaseProvider{
 
   Future<int> delete(int id) async {
     final db = await database;
-
+    DatabaseProviderRecord.db.deleteWithCustomerId(id);
     return await db.delete(
       TABLE_CUSTOMER,
       where: "id = ?",
@@ -87,5 +89,4 @@ class DatabaseProvider{
       whereArgs: [customer.id],
     );
   }
-
 }

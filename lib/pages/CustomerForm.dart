@@ -1,6 +1,7 @@
 import 'package:copper_customer/bloc/CustomerBloc.dart';
 import 'package:copper_customer/db/DatabaseProviderCustomer.dart';
 import 'package:copper_customer/event/customer/AddCustomer.dart';
+import 'package:copper_customer/event/customer/SetCustomer.dart';
 import 'package:copper_customer/event/customer/UpdateCustomer.dart';
 import 'package:copper_customer/model/Customer.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +23,7 @@ class CustomerForm extends StatefulWidget {
 class CustomerFormState extends State<CustomerForm> {
   String _name;
   bool _isActive = true;
+  int _id;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -79,6 +81,7 @@ class CustomerFormState extends State<CustomerForm> {
   void initState() {
     super.initState();
     if (widget.customer != null) {
+      _id = widget.customer.id;
       _name = widget.customer.name;
       _isActive = widget.customer.isActive;
     }
@@ -121,6 +124,11 @@ class CustomerFormState extends State<CustomerForm> {
                       AddCustomer(storedCustomer),
                     ),
                   );
+                  DatabaseProvider.db.getCustomer().then(
+                        (customerList) {
+                      BlocProvider.of<CustomerBloc>(context).add(SetCustomer(customerList));
+                    },
+                  );
 
                   Navigator.pop(context);
                 },
@@ -145,16 +153,21 @@ class CustomerFormState extends State<CustomerForm> {
                             _formKey.currentState.save();
 
                             Customer customer = Customer(
+                              id: _id,
                               name: _name,
                               isActive: _isActive,
                             );
 
-                            DatabaseProvider.db.update(widget.customer).then(
+                            DatabaseProvider.db.update(customer).then(
                                   (storedFood) => BlocProvider.of<CustomerBloc>(context).add(
-                                UpdateCustomer(widget.customerIndex, customer),
+                                UpdateCustomer(customer.id, customer)
                               ),
                             );
-
+                            DatabaseProvider.db.getCustomer().then(
+                                  (customerList) {
+                                BlocProvider.of<CustomerBloc>(context).add(SetCustomer(customerList));
+                              },
+                            );
                             Navigator.pop(context);
                           },
                         ),

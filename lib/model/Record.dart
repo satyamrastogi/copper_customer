@@ -11,8 +11,7 @@ class Record {
   double totalPrice;
 
   Record(
-      {
-        this.id,
+      {this.id,
       this.customerId,
       this.copperWireSize,
       this.length,

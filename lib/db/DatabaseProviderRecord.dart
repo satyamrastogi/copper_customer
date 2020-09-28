@@ -42,7 +42,7 @@ class DatabaseProviderRecord {
 
         await database.execute(
           "CREATE TABLE $TABLE_RECORD ("
-          "$RECORD_ID INTEGER PRIMARY KEY,"
+          "$RECORD_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
           "$CUSTOMER_ID INTEGER,"
           "$COPPER_WIRE_SIZE FLOAT,"
           "$LENGTH FLOAT,"
@@ -58,7 +58,7 @@ class DatabaseProviderRecord {
 
   Future<List<Record>> getRecord(int customerId) async {
     final db = await database;
-    var records = await db.rawQuery("SELECT * FROM $TABLE_RECORD where CUSTOMER_ID = $customerId");
+    var records = await db.rawQuery("SELECT * FROM $TABLE_RECORD where CUSTOMER_ID = $customerId order by id desc");
 
     List<Record> result = List<Record>();
 
@@ -85,6 +85,16 @@ class DatabaseProviderRecord {
       where: "id = ?",
       whereArgs: [id],
     );
+  }
+  Future<int> deleteWithCustomerId(int id) async {
+    final db = await database;
+
+    var result = await db.delete(
+      TABLE_RECORD,
+      where: "customer_id = ?",
+      whereArgs: [id],
+    );
+    return result;
   }
 
   Future<int> update(Record record) async {

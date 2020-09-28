@@ -48,6 +48,11 @@ class _CustomerListState extends State<CustomerList> {
               BlocProvider.of<CustomerBloc>(context).add(
                 DeleteCustomer(index),
               );
+              DatabaseProvider.db.getCustomer().then(
+                    (customerList) {
+                  BlocProvider.of<CustomerBloc>(context).add(SetCustomer(customerList));
+                },
+              );
               Navigator.pop(context);
             }),
             child: Text("Delete"),
@@ -76,7 +81,7 @@ class _CustomerListState extends State<CustomerList> {
                 return ListTile(
                     title: Text(customer.name, style: TextStyle(fontSize: 30)),
                     onLongPress: () =>
-                        showCustomerDialog(context, customer, index),
+                        showCustomerDialog(context, customer, customer.id),
                     onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -89,7 +94,7 @@ class _CustomerListState extends State<CustomerList> {
                   Divider(color: Colors.black),
             );
           },
-          listener: (BuildContext context, foodList) {},
+          listener: (BuildContext context, customerList) {},
         ),
       ),
       floatingActionButton: FloatingActionButton(

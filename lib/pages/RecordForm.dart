@@ -1,6 +1,7 @@
 import 'package:copper_customer/bloc/RecordBloc.dart';
 import 'package:copper_customer/db/DatabaseProviderRecord.dart';
 import 'package:copper_customer/event/record/AddRecord.dart';
+import 'package:copper_customer/event/record/SetRecord.dart';
 import 'package:copper_customer/event/record/UpdateRecord.dart';
 import 'package:copper_customer/model/Customer.dart';
 import 'package:copper_customer/model/Record.dart';
@@ -23,6 +24,7 @@ class RecordForm extends StatefulWidget {
 
 class RecordFormState extends State<RecordForm> {
   String _customerName;
+  int _id;
   double _price;
   double _length;
   double _cooper_wire_size;
@@ -96,7 +98,7 @@ class RecordFormState extends State<RecordForm> {
       maxLength: 15,
       style: TextStyle(fontSize: 18),
       onSaved: (String value) {
-        if(value.isNotEmpty){
+        if (value.isNotEmpty) {
           _gst_percentage = double.parse(value);
         }
       },
@@ -110,7 +112,7 @@ class RecordFormState extends State<RecordForm> {
       maxLength: 15,
       style: TextStyle(fontSize: 18),
       onSaved: (String value) {
-        if(value.isNotEmpty){
+        if (value.isNotEmpty) {
           _gst_percentage = double.parse(value);
         }
       },
@@ -123,12 +125,14 @@ class RecordFormState extends State<RecordForm> {
     if (widget.customer != null) {
       _customerName = widget.customer.name;
     }
-    if(widget.record != null){
+    if (widget.record != null) {
+      _id = widget.record.id;
       _price = widget.record.price;
       _gst_percentage = widget.record.gstPercentage;
       _cgst_percentage = widget.record.cgstPercentage;
       _cooper_wire_size = widget.record.copperWireSize;
       _length = widget.record.length;
+      _total_price = widget.record.totalPrice;
     }
   }
 
@@ -140,7 +144,8 @@ class RecordFormState extends State<RecordForm> {
         margin: EdgeInsets.all(24),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: new SingleChildScrollView(
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _buildCopperWireSize(),
@@ -166,7 +171,7 @@ class RecordFormState extends State<RecordForm> {
                       _cgst_price += _total_price * _cgst_percentage / 100;
                     if (_gst_percentage != null)
                       _gst_price += _total_price * _gst_percentage / 100;
-                    _total_price = _cgst_price + _gst_price;
+                    _total_price += _cgst_price + _gst_price;
                     Record record = Record(
                         copperWireSize: _cooper_wire_size,
                         cgstPercentage: _cgst_percentage,
@@ -174,13 +179,18 @@ class RecordFormState extends State<RecordForm> {
                         length: _length,
                         price: _price,
                         totalPrice: _total_price,
-                    customerId: widget.customer.id);
+                        customerId: widget.customer.id);
                     DatabaseProviderRecord.db.insert(record).then(
                           (storedRecord) =>
                               BlocProvider.of<RecordBloc>(context).add(
                             AddRecord(storedRecord),
                           ),
                         );
+                    DatabaseProviderRecord.db.getRecord(widget.customer.id).then(
+                          (recordList) {
+                        BlocProvider.of<RecordBloc>(context).add(SetRecord(recordList));
+                      },
+                    );
 
                     Navigator.pop(context);
                   },
@@ -206,16 +216,36 @@ class RecordFormState extends State<RecordForm> {
                               }
 
                               _formKey.currentState.save();
+                              _total_price = _cooper_wire_size * _length * _price;
+                              if (_cgst_percentage != null)
+                                _cgst_price += _total_price * _cgst_percentage / 100;
+                              if (_gst_percentage != null)
+                                _gst_price += _total_price * _gst_percentage / 100;
+                              _total_price += _cgst_price + _gst_price;
+                              Record record = Record(
+                                  id: _id,
+                                  copperWireSize: _cooper_wire_size,
+                                  cgstPercentage: _cgst_percentage,
+                                  gstPercentage: _gst_percentage,
+                                  length: _length,
+                                  price: _price,
+                                  totalPrice: _total_price,
+                                  customerId: widget.customer.id);
                               DatabaseProviderRecord.db
-                                  .update(widget.record)
+                                  .update(record)
                                   .then(
                                     (storedRecord) =>
                                         BlocProvider.of<RecordBloc>(context)
                                             .add(
                                       UpdateRecord(
-                                          widget.recordIndex, widget.record),
+                                          record.id, record),
                                     ),
                                   );
+                              DatabaseProviderRecord.db.getRecord(widget.customer.id).then(
+                                    (recordList) {
+                                  BlocProvider.of<RecordBloc>(context).add(SetRecord(recordList));
+                                },
+                              );
 
                               Navigator.pop(context);
                             },
@@ -233,7 +263,7 @@ class RecordFormState extends State<RecordForm> {
                   ],
                 ),
             ],
-          ),
+          )),
         ),
       ),
     );

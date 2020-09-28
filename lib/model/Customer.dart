@@ -7,7 +7,7 @@ class Customer{
   bool isActive;
 
 
-  Customer({this.name, this.isActive});
+  Customer({this.id,this.name, this.isActive});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{

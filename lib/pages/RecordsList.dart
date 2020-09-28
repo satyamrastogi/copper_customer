@@ -1,5 +1,6 @@
 import 'package:copper_customer/bloc/RecordBloc.dart';
 import 'package:copper_customer/db/DatabaseProviderRecord.dart';
+import 'package:copper_customer/event/record/DeleteRecord.dart';
 import 'package:copper_customer/event/record/SetRecord.dart';
 import 'package:copper_customer/model/Customer.dart';
 import 'package:copper_customer/model/Record.dart';
@@ -7,7 +8,6 @@ import 'package:copper_customer/pages/RecordForm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 class RecordsList extends StatefulWidget {
   final Customer customer;
@@ -30,6 +30,42 @@ class _RecordListState extends State<RecordsList> {
       (recordList) {
         BlocProvider.of<RecordBloc>(context).add(SetRecord(recordList));
       },
+    );
+  }
+
+  showRecordDialog(
+      BuildContext context, Customer customer, Record record, int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(customer.name),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RecordForm(
+                    customer: customer, record: record, recordIndex: index),
+              ),
+            ),
+            child: Text("Update"),
+          ),
+          FlatButton(
+            onPressed: () =>
+                DatabaseProviderRecord.db.delete(record.id).then((_) {
+              BlocProvider.of<RecordBloc>(context).add(
+                DeleteRecord(index),
+              );
+              Navigator.pop(context);
+            }),
+            child: Text("Delete"),
+          ),
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -58,14 +94,18 @@ class _RecordListState extends State<RecordsList> {
                     subtitle: Text(" GST :" +
                         _getZeroIfNull(record.gstPercentage) +
                         " CGST : " +
-                        _getZeroIfNull(record.cgstPercentage)));
+                        _getZeroIfNull(record.cgstPercentage) +
+                        " Total Price : " +
+                        record.totalPrice.toString()),
+                    onLongPress: () =>
+                        showRecordDialog(context, customer, record, record.id));
               },
               itemCount: recordList.length,
               separatorBuilder: (BuildContext context, int index) =>
                   Divider(color: Colors.black),
             );
           },
-          listener: (BuildContext context, foodList) {},
+          listener: (BuildContext context, recordList) {},
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -81,8 +121,7 @@ class _RecordListState extends State<RecordsList> {
   }
 
   String _getZeroIfNull(double value) {
-    if(value == null)
-      return "0";
+    if (value == null) return "0";
     return value.toString();
   }
 }
