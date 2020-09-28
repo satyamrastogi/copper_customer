@@ -46,6 +46,9 @@ class RecordFormState extends State<RecordForm> {
         if (value.isEmpty) {
           return 'price is Required';
         }
+        if(double.tryParse(value) == null) {
+          return 'Enter Number';
+        }
         return null;
       },
       onSaved: (String value) {
@@ -63,6 +66,9 @@ class RecordFormState extends State<RecordForm> {
       validator: (String value) {
         if (value.isEmpty) {
           return 'length is Required';
+        }
+        if(double.tryParse(value) == null) {
+          return 'Enter Number';
         }
         return null;
       },
@@ -83,6 +89,9 @@ class RecordFormState extends State<RecordForm> {
         if (value.isEmpty) {
           return 'size is Required';
         }
+        if(double.tryParse(value) == null) {
+          return 'Enter Number';
+        }
         return null;
       },
       onSaved: (String value) {
@@ -97,6 +106,12 @@ class RecordFormState extends State<RecordForm> {
       decoration: InputDecoration(labelText: 'GST'),
       maxLength: 15,
       style: TextStyle(fontSize: 18),
+        validator: (String value) {
+          if(double.tryParse(value) == null) {
+            return 'Enter Number';
+          }
+          return null;
+        },
       onSaved: (String value) {
         if (value.isNotEmpty) {
           _gst_percentage = double.parse(value);
@@ -111,9 +126,15 @@ class RecordFormState extends State<RecordForm> {
       decoration: InputDecoration(labelText: 'CGST'),
       maxLength: 15,
       style: TextStyle(fontSize: 18),
+        validator: (String value) {
+          if(double.tryParse(value) == null) {
+            return 'Enter Number';
+          }
+          return null;
+        },
       onSaved: (String value) {
         if (value.isNotEmpty) {
-          _gst_percentage = double.parse(value);
+          _cgst_percentage = double.parse(value);
         }
       },
     );
