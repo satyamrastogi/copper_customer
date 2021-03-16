@@ -9,6 +9,8 @@ class Record {
   double cgstPercentage;
   double gstPercentage;
   double totalPrice;
+  String recordDate;
+  String createdAt;
 
   Record(
       {this.id,
@@ -16,9 +18,9 @@ class Record {
       this.copperWireSize,
       this.length,
       this.price,
-      this.cgstPercentage,
-      this.gstPercentage,
-      this.totalPrice});
+      this.totalPrice,
+      this.recordDate,
+      this.createdAt});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -27,9 +29,9 @@ class Record {
       DatabaseProviderRecord.COPPER_WIRE_SIZE: copperWireSize,
       DatabaseProviderRecord.LENGTH: length,
       DatabaseProviderRecord.PRICE: price,
-      DatabaseProviderRecord.CGST_PERCENTAGE: cgstPercentage,
-      DatabaseProviderRecord.GST_PERCENTAGE: gstPercentage,
-      DatabaseProviderRecord.TOTAL_PRICE: totalPrice
+      DatabaseProviderRecord.TOTAL_PRICE: totalPrice,
+      DatabaseProviderRecord.RECORD_DATE: recordDate,
+      DatabaseProviderRecord.CREATED_AT: createdAt
     };
 
     if (id != null) {
@@ -45,8 +47,8 @@ class Record {
     copperWireSize = map[DatabaseProviderRecord.COPPER_WIRE_SIZE];
     length = map[DatabaseProviderRecord.LENGTH];
     price = map[DatabaseProviderRecord.PRICE];
-    cgstPercentage = map[DatabaseProviderRecord.CGST_PERCENTAGE];
-    gstPercentage = map[DatabaseProviderRecord.GST_PERCENTAGE];
     totalPrice = map[DatabaseProviderRecord.TOTAL_PRICE];
+    recordDate = map[DatabaseProviderRecord.RECORD_DATE];
+    createdAt = map[DatabaseProviderRecord.CREATED_AT];
   }
 }

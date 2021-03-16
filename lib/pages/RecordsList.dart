@@ -91,10 +91,8 @@ class _RecordListState extends State<RecordsList> {
                             ", Price :" +
                             record.price.toString(),
                         style: TextStyle(fontSize: 18)),
-                    subtitle: Text(" GST :" +
-                        _getZeroIfNull(record.gstPercentage) +
-                        " CGST : " +
-                        _getZeroIfNull(record.cgstPercentage) +
+                    subtitle: Text(" order date :" +
+                        record.recordDate +
                         " Total Price : " +
                         record.totalPrice.toString()),
                     onLongPress: () =>

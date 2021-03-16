@@ -31,11 +31,22 @@ class RecordFormState extends State<RecordForm> {
   double _gst_percentage;
   double _cgst_percentage;
   double _total_price;
-  double _cgst_price = 0;
-  double _gst_price = 0;
+  DateTime selectedDate = DateTime.now();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  Future<void>  _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate, // Refer step 1
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
   Widget _buildPrice() {
     return TextFormField(
       initialValue: _price == null ? "" : _price.toString(),
@@ -100,45 +111,45 @@ class RecordFormState extends State<RecordForm> {
     );
   }
 
-  Widget _buildGSTPercentage() {
-    return TextFormField(
-      initialValue: _gst_percentage == null ? "" : _gst_percentage.toString(),
-      decoration: InputDecoration(labelText: 'GST'),
-      maxLength: 15,
-      style: TextStyle(fontSize: 18),
-        validator: (String value) {
-          if(double.tryParse(value) == null) {
-            return 'Enter Number';
-          }
-          return null;
-        },
-      onSaved: (String value) {
-        if (value.isNotEmpty) {
-          _gst_percentage = double.parse(value);
-        }
-      },
-    );
-  }
-
-  Widget _buildCGSTPercentage() {
-    return TextFormField(
-      initialValue: _cgst_percentage == null ? "" : _cgst_percentage.toString(),
-      decoration: InputDecoration(labelText: 'CGST'),
-      maxLength: 15,
-      style: TextStyle(fontSize: 18),
-        validator: (String value) {
-          if(double.tryParse(value) == null) {
-            return 'Enter Number';
-          }
-          return null;
-        },
-      onSaved: (String value) {
-        if (value.isNotEmpty) {
-          _cgst_percentage = double.parse(value);
-        }
-      },
-    );
-  }
+  // Widget _buildGSTPercentage() {
+  //   return TextFormField(
+  //     initialValue: _gst_percentage == null ? "" : _gst_percentage.toString(),
+  //     decoration: InputDecoration(labelText: 'GST'),
+  //     maxLength: 15,
+  //     style: TextStyle(fontSize: 18),
+  //       validator: (String value) {
+  //         if(double.tryParse(value) == null) {
+  //           return 'Enter Number';
+  //         }
+  //         return null;
+  //       },
+  //     onSaved: (String value) {
+  //       if (value.isNotEmpty) {
+  //         _gst_percentage = double.parse(value);
+  //       }
+  //     },
+  //   );
+  // }
+  //
+  // Widget _buildCGSTPercentage() {
+  //   return TextFormField(
+  //     initialValue: _cgst_percentage == null ? "" : _cgst_percentage.toString(),
+  //     decoration: InputDecoration(labelText: 'CGST'),
+  //     maxLength: 15,
+  //     style: TextStyle(fontSize: 18),
+  //       validator: (String value) {
+  //         if(double.tryParse(value) == null) {
+  //           return 'Enter Number';
+  //         }
+  //         return null;
+  //       },
+  //     onSaved: (String value) {
+  //       if (value.isNotEmpty) {
+  //         _cgst_percentage = double.parse(value);
+  //       }
+  //     },
+  //   );
+  // }
 
   @override
   void initState() {
@@ -172,8 +183,15 @@ class RecordFormState extends State<RecordForm> {
               _buildCopperWireSize(),
               _buildLength(),
               _buildPrice(),
-              _buildGSTPercentage(),
-              _buildCGSTPercentage(),
+              Text("${selectedDate.toLocal()}".split(' ')[0]),
+              SizedBox(height: 20.0,),
+              RaisedButton(
+                child: Text(
+                  'Select date',
+                  style: TextStyle(color: Colors.blue, fontSize: 10),
+                ),
+                onPressed: () => _selectDate(context),
+              ),
               SizedBox(height: 10),
               if (widget.record == null)
                 RaisedButton(
@@ -188,15 +206,12 @@ class RecordFormState extends State<RecordForm> {
 
                     _formKey.currentState.save();
                     _total_price = _cooper_wire_size * _length * _price;
-                    if (_cgst_percentage != null)
-                      _cgst_price += _total_price * _cgst_percentage / 100;
-                    if (_gst_percentage != null)
-                      _gst_price += _total_price * _gst_percentage / 100;
-                    _total_price += _cgst_price + _gst_price;
+                    DateTime createdAt = DateTime.now().toLocal();
+                    DateTime recordDate = selectedDate.toLocal();
                     Record record = Record(
                         copperWireSize: _cooper_wire_size,
-                        cgstPercentage: _cgst_percentage,
-                        gstPercentage: _gst_percentage,
+                        createdAt: "$createdAt".split(' ')[0],
+                        recordDate: "$recordDate".split(' ')[0],
                         length: _length,
                         price: _price,
                         totalPrice: _total_price,
@@ -238,16 +253,9 @@ class RecordFormState extends State<RecordForm> {
 
                               _formKey.currentState.save();
                               _total_price = _cooper_wire_size * _length * _price;
-                              if (_cgst_percentage != null)
-                                _cgst_price += _total_price * _cgst_percentage / 100;
-                              if (_gst_percentage != null)
-                                _gst_price += _total_price * _gst_percentage / 100;
-                              _total_price += _cgst_price + _gst_price;
                               Record record = Record(
                                   id: _id,
                                   copperWireSize: _cooper_wire_size,
-                                  cgstPercentage: _cgst_percentage,
-                                  gstPercentage: _gst_percentage,
                                   length: _length,
                                   price: _price,
                                   totalPrice: _total_price,

@@ -10,9 +10,9 @@ class DatabaseProviderRecord {
   static const String COPPER_WIRE_SIZE = "COPPER_WIRE_SIZE";
   static const String LENGTH = "LENGTH";
   static const String PRICE = "PRICE";
-  static const String GST_PERCENTAGE = "GST_PERCENTAGE";
-  static const String CGST_PERCENTAGE = "CGST_PERCENTAGE";
   static const String TOTAL_PRICE = "TOTAL_PRICE";
+  static const String RECORD_DATE = "RECORD_DATE";
+  static const String CREATED_AT = "CREATED_AT";
 
   DatabaseProviderRecord._();
 
@@ -47,9 +47,9 @@ class DatabaseProviderRecord {
           "$COPPER_WIRE_SIZE FLOAT,"
           "$LENGTH FLOAT,"
           "$PRICE FLOAT,"
-          "$CGST_PERCENTAGE FLOAT,"
-          "$GST_PERCENTAGE FLOAT,"
-          "$TOTAL_PRICE FLOAT"
+          "$TOTAL_PRICE FLOAT,"
+          "$RECORD_DATE String,"
+          "$CREATED_AT String"
           ")",
         );
       },
@@ -58,7 +58,7 @@ class DatabaseProviderRecord {
 
   Future<List<Record>> getRecord(int customerId) async {
     final db = await database;
-    var records = await db.rawQuery("SELECT * FROM $TABLE_RECORD where CUSTOMER_ID = $customerId order by id desc");
+    var records = await db.rawQuery("SELECT * FROM $TABLE_RECORD where CUSTOMER_ID = $customerId order by $RECORD_DATE desc");
 
     List<Record> result = List<Record>();
 
