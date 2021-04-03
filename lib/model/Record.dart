@@ -6,11 +6,14 @@ class Record {
   double copperWireSize;
   double length;
   double price;
-  double cgstPercentage;
-  double gstPercentage;
   double totalPrice;
   String recordDate;
   String createdAt;
+
+  @override
+  String toString() {
+    return 'Record{id: $id, customerId: $customerId, copperWireSize: $copperWireSize, length: $length, price: $price, totalPrice: $totalPrice, recordDate: $recordDate, createdAt: $createdAt}';
+  }
 
   Record(
       {this.id,

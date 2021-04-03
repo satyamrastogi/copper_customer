@@ -22,8 +22,10 @@ class CustomerForm extends StatefulWidget {
 
 class CustomerFormState extends State<CustomerForm> {
   String _name;
-  bool _isActive = true;
   int _id;
+  String _gstNumber;
+  String _phoneNumber;
+  String _address;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -46,6 +48,41 @@ class CustomerFormState extends State<CustomerForm> {
     );
   }
 
+  Widget _buildAddress() {
+    return TextFormField(
+      initialValue: _address,
+      decoration: InputDecoration(labelText: 'Address'),
+      maxLength: 15,
+      style: TextStyle(fontSize: 28),
+      onSaved: (String value) {
+        _address = value;
+      },
+    );
+  }
+
+  Widget _buildGstNumber() {
+    return TextFormField(
+      initialValue: _gstNumber,
+      decoration: InputDecoration(labelText: 'GST NUMBER'),
+      maxLength: 15,
+      style: TextStyle(fontSize: 28),
+      onSaved: (String value) {
+        _gstNumber = value;
+      },
+    );
+  }
+
+  Widget _buildPhoneNumber() {
+    return TextFormField(
+      initialValue: _phoneNumber,
+      decoration: InputDecoration(labelText: 'Phone Number'),
+      maxLength: 15,
+      style: TextStyle(fontSize: 28),
+      onSaved: (String value) {
+        _phoneNumber = value;
+      },
+    );
+  }
   // Widget _buildCalories() {
   //   return TextFormField(
   //     initialValue: _calories,
@@ -67,15 +104,15 @@ class CustomerFormState extends State<CustomerForm> {
   //   );
   // }
 
-  Widget _buildIsActive() {
-    return SwitchListTile(
-      title: Text("Active?", style: TextStyle(fontSize: 20)),
-      value: _isActive,
-      onChanged: (bool newValue) => setState(() {
-        _isActive = newValue;
-      }),
-    );
-  }
+  // Widget _buildIsActive() {
+  //   return SwitchListTile(
+  //     title: Text("Active?", style: TextStyle(fontSize: 20)),
+  //     value: _isActive,
+  //     onChanged: (bool newValue) => setState(() {
+  //       _isActive = newValue;
+  //     }),
+  //   );
+  // }
 
   @override
   void initState() {
@@ -83,7 +120,9 @@ class CustomerFormState extends State<CustomerForm> {
     if (widget.customer != null) {
       _id = widget.customer.id;
       _name = widget.customer.name;
-      _isActive = widget.customer.isActive;
+      _gstNumber = widget.customer.gstNumber;
+      _address = widget.customer.address;
+      _phoneNumber = widget.customer.phoneNumber;
     }
   }
 
@@ -100,7 +139,9 @@ class CustomerFormState extends State<CustomerForm> {
             children: <Widget>[
               _buildName(),
               SizedBox(height: 16),
-              _buildIsActive(),
+              _buildAddress(),
+              _buildGstNumber(),
+              _buildPhoneNumber(),
               SizedBox(height: 20),
               if (widget.customer == null) RaisedButton(
                 child: Text(
@@ -113,12 +154,14 @@ class CustomerFormState extends State<CustomerForm> {
                   }
 
                   _formKey.currentState.save();
-
+                  DateTime createdAt = DateTime.now().toLocal();
                   Customer customer = Customer(
                     name: _name,
-                    isActive: _isActive,
+                    phoneNumber: _phoneNumber,
+                    address: _address,
+                    gstNumber: _gstNumber,
+                    createdAt: "$createdAt".split(' ')[0]
                   );
-
                   DatabaseProvider.db.insert(customer).then(
                         (storedCustomer) => BlocProvider.of<CustomerBloc>(context).add(
                       AddCustomer(storedCustomer),
@@ -146,7 +189,6 @@ class CustomerFormState extends State<CustomerForm> {
                           ),
                           onPressed: () {
                             if (!_formKey.currentState.validate()) {
-                              print("form");
                               return;
                             }
 
@@ -155,9 +197,10 @@ class CustomerFormState extends State<CustomerForm> {
                             Customer customer = Customer(
                               id: _id,
                               name: _name,
-                              isActive: _isActive,
+                              phoneNumber: _phoneNumber,
+                              gstNumber: _gstNumber,
+                              address: _address,
                             );
-
                             DatabaseProvider.db.update(customer).then(
                                   (storedFood) => BlocProvider.of<CustomerBloc>(context).add(
                                 UpdateCustomer(customer.id, customer)

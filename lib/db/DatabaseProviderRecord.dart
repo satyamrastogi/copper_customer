@@ -35,7 +35,7 @@ class DatabaseProviderRecord {
     String dbPath = await getDatabasesPath();
 
     return await openDatabase(
-      join(dbPath, 'recordTest1.db'),
+      join(dbPath, 'recordTest2.db'),
       version: 1,
       onCreate: (Database database, int version) async {
         print("Creating record table");

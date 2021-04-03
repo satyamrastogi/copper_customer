@@ -8,7 +8,10 @@ class DatabaseProvider {
   static const String TABLE_CUSTOMER = "CUSTOMER";
   static const String CUSTOMER_ID = "ID";
   static const String NAME = "NAME";
-  static const String IS_ACTIVE = "IS_ACTIVE";
+  static const String PHONE_NUMBER = "PHONE_NUMBER";
+  static const String ADDRESS = "ADDRESS";
+  static const String GST_NO = "GST_NO";
+  static const String CREATED_AT = "CREATED_AT";
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -30,7 +33,7 @@ class DatabaseProvider {
     String dbPath = await getDatabasesPath();
 
     return await openDatabase(
-      join(dbPath, 'customer.db'),
+      join(dbPath, 'customer3.db'),
       version: 1,
       onCreate: (Database database, int version) async {
         print("Creating food table");
@@ -39,7 +42,10 @@ class DatabaseProvider {
           "CREATE TABLE $TABLE_CUSTOMER ("
           "$CUSTOMER_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
           "$NAME TEXT,"
-          "$IS_ACTIVE BOOL"
+          "$PHONE_NUMBER STRING,"
+          "$ADDRESS STRING,"
+          "$GST_NO STRING,"
+          "$CREATED_AT STRING"
           ")",
         );
       },
@@ -50,13 +56,13 @@ class DatabaseProvider {
     final db = await database;
 
     var customers =
-        await db.query(TABLE_CUSTOMER, columns: [CUSTOMER_ID, NAME, IS_ACTIVE]);
+        await db.query(TABLE_CUSTOMER, columns: [CUSTOMER_ID, NAME, ADDRESS, GST_NO, PHONE_NUMBER, CREATED_AT]);
 
     List<Customer> result = List<Customer>();
 
     customers.forEach((currentFood) {
       Customer food = Customer.fromMap(currentFood);
-
+      print(food);
       result.add(food);
     });
 

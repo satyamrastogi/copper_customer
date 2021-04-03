@@ -38,7 +38,7 @@ class _RecordListState extends State<RecordsList> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(customer.name),
+        title: Text("Order ID: " + (index).toString()),
         actions: <Widget>[
           FlatButton(
             onPressed: () => Navigator.pushReplacement(
@@ -83,20 +83,23 @@ class _RecordListState extends State<RecordsList> {
                 print("recordList: $recordList");
                 Record record = recordList[index];
                 return ListTile(
-                    title: Text(
-                        "Width : " +
+                    title: Text("ID : " + (index+1).toString()+
+                        ", Width : " +
                             record.copperWireSize.toString() +
-                            ", Length : " +
+                            ", Quantity : " +
                             record.length.toString() +
                             ", Price :" +
                             record.price.toString(),
-                        style: TextStyle(fontSize: 18)),
-                    subtitle: Text(" order date :" +
-                        record.recordDate +
-                        " Total Price : " +
-                        record.totalPrice.toString()),
+                        style: TextStyle(fontSize: 15)),
                     onLongPress: () =>
-                        showRecordDialog(context, customer, record, record.id));
+                        showRecordDialog(context, customer, record, record.id),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              RecordsList(customer: customer)),
+                    )
+                );
               },
               itemCount: recordList.length,
               separatorBuilder: (BuildContext context, int index) =>

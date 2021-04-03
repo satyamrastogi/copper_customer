@@ -1,4 +1,5 @@
 import 'package:copper_customer/bloc/RecordBloc.dart';
+import 'package:copper_customer/component/BasicComponent.dart';
 import 'package:copper_customer/db/DatabaseProviderRecord.dart';
 import 'package:copper_customer/event/record/AddRecord.dart';
 import 'package:copper_customer/event/record/SetRecord.dart';
@@ -24,14 +25,14 @@ class RecordForm extends StatefulWidget {
 
 class RecordFormState extends State<RecordForm> {
   String _customerName;
+  String _customerGstNumber;
+  String _customerPhoneNumber;
   int _id;
   double _price;
   double _length;
   double _cooper_wire_size;
-  double _gst_percentage;
-  double _cgst_percentage;
   double _total_price;
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -111,25 +112,20 @@ class RecordFormState extends State<RecordForm> {
     );
   }
 
-  // Widget _buildGSTPercentage() {
-  //   return TextFormField(
-  //     initialValue: _gst_percentage == null ? "" : _gst_percentage.toString(),
-  //     decoration: InputDecoration(labelText: 'GST'),
-  //     maxLength: 15,
-  //     style: TextStyle(fontSize: 18),
-  //       validator: (String value) {
-  //         if(double.tryParse(value) == null) {
-  //           return 'Enter Number';
-  //         }
-  //         return null;
-  //       },
-  //     onSaved: (String value) {
-  //       if (value.isNotEmpty) {
-  //         _gst_percentage = double.parse(value);
-  //       }
-  //     },
-  //   );
-  // }
+  Widget _buildCustomerDetail() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        BasicComponent.boxWithText("Name: $_customerName"),
+        BasicComponent.getBasicDivider(),
+        BasicComponent.boxWithPhoneNumber(_customerPhoneNumber),
+        BasicComponent.getBasicDivider(),
+        BasicComponent.boxWithText("GST Number: $_customerGstNumber"),
+        BasicComponent.getBasicDivider(),
+        SizedBox(height: 50.0,)
+      ],
+    );
+  }
   //
   // Widget _buildCGSTPercentage() {
   //   return TextFormField(
@@ -156,15 +152,19 @@ class RecordFormState extends State<RecordForm> {
     super.initState();
     if (widget.customer != null) {
       _customerName = widget.customer.name;
+      _customerGstNumber = widget.customer.gstNumber == null ? "NA" : widget.customer.gstNumber;
+      _customerPhoneNumber = widget.customer.phoneNumber ==  null ? "NA" : widget.customer.phoneNumber;
     }
     if (widget.record != null) {
       _id = widget.record.id;
       _price = widget.record.price;
-      _gst_percentage = widget.record.gstPercentage;
-      _cgst_percentage = widget.record.cgstPercentage;
       _cooper_wire_size = widget.record.copperWireSize;
       _length = widget.record.length;
       _total_price = widget.record.totalPrice;
+      if (widget.record.recordDate != null)
+        selectedDate = DateTime.parse(widget.record.recordDate);
+      else
+        selectedDate = DateTime.now();
     }
   }
 
@@ -178,8 +178,8 @@ class RecordFormState extends State<RecordForm> {
           key: _formKey,
           child: new SingleChildScrollView(
               child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              _buildCustomerDetail(),
               _buildCopperWireSize(),
               _buildLength(),
               _buildPrice(),
@@ -253,13 +253,15 @@ class RecordFormState extends State<RecordForm> {
 
                               _formKey.currentState.save();
                               _total_price = _cooper_wire_size * _length * _price;
+                              DateTime recordDate = selectedDate.toLocal();
                               Record record = Record(
                                   id: _id,
                                   copperWireSize: _cooper_wire_size,
                                   length: _length,
                                   price: _price,
                                   totalPrice: _total_price,
-                                  customerId: widget.customer.id);
+                                  customerId: widget.customer.id,
+                                  recordDate: "$recordDate".split(' ')[0]);
                               DatabaseProviderRecord.db
                                   .update(record)
                                   .then(

@@ -1,10 +1,12 @@
 import 'package:copper_customer/bloc/CustomerBloc.dart';
 import 'package:copper_customer/bloc/RecordBloc.dart';
 import 'package:copper_customer/pages/CustomerList.dart';
+import 'package:copper_customer/service/ServiceLocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
+  setupLocator();
   runApp(MyApp());
 }
 
